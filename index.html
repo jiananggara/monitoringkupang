@@ -1,0 +1,154 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Sales Monitoring</title>
+  <style>
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      font-family: Arial, sans-serif;
+      background: #f3f5f9;
+      color: #172033;
+    }
+    header {
+      background: #142b4a;
+      color: white;
+      padding: 24px;
+    }
+    header h1 { margin: 0 0 8px; }
+    main { max-width: 1100px; margin: auto; padding: 20px; }
+    .cards {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+      gap: 14px;
+    }
+    .card, .panel {
+      background: white;
+      border-radius: 14px;
+      padding: 20px;
+      box-shadow: 0 3px 14px #1720330d;
+    }
+    .muted { color: #697586; font-size: 14px; }
+    .value { font-size: 26px; font-weight: bold; margin-top: 10px; }
+    .section-title { margin: 28px 0 14px; }
+    .table-wrap { overflow-x: auto; }
+    table { width: 100%; border-collapse: collapse; min-width: 480px; }
+    th, td {
+      padding: 13px 10px;
+      border-bottom: 1px solid #e7ebf0;
+      text-align: left;
+    }
+    th { color: #697586; font-size: 13px; }
+    .bar {
+      background: #e8edf5;
+      height: 9px;
+      border-radius: 10px;
+      margin-top: 7px;
+      overflow: hidden;
+    }
+    .bar span {
+      display: block;
+      height: 100%;
+      background: #2675e8;
+      border-radius: 10px;
+    }
+    footer { padding: 20px; text-align: center; color: #697586; }
+  </style>
+</head>
+<body>
+  <header>
+    <h1>Sales Monitoring</h1>
+    <div>Branch Performance Dashboard</div>
+    <p>Periode: Oktober 2026 · Data simulasi</p>
+  </header>
+
+  <main>
+    <div class="cards">
+      <div class="card">
+        <div class="muted">Total Target</div>
+        <div class="value" id="target">-</div>
+      </div>
+      <div class="card">
+        <div class="muted">Total Actual</div>
+        <div class="value" id="actual">-</div>
+      </div>
+      <div class="card">
+        <div class="muted">Achievement</div>
+        <div class="value" id="achievement">-</div>
+      </div>
+      <div class="card">
+        <div class="muted">Gap terhadap Target</div>
+        <div class="value" id="gap">-</div>
+      </div>
+    </div>
+
+    <h2 class="section-title">Achievement per Area</h2>
+    <div class="panel table-wrap">
+      <table>
+        <thead>
+          <tr>
+            <th>Area</th>
+            <th>Target</th>
+            <th>Actual</th>
+            <th>Achievement</th>
+          </tr>
+        </thead>
+        <tbody id="sales-table"></tbody>
+      </table>
+    </div>
+
+    <h2 class="section-title">Perbandingan Achievement</h2>
+    <div class="panel" id="chart"></div>
+  </main>
+
+  <footer>Sales Monitoring · Versi 1.0</footer>
+
+  <script>
+    const sales = [
+      { area: "Timor", target: 100000000, actual: 85000000 },
+      { area: "Flores", target: 80000000, actual: 76000000 },
+      { area: "Sumba", target: 50000000, actual: 42000000 }
+    ];
+
+    const rupiah = n => "Rp" + n.toLocaleString("id-ID");
+    const totalTarget = sales.reduce((s, x) => s + x.target, 0);
+    const totalActual = sales.reduce((s, x) => s + x.actual, 0);
+    const achievement = totalActual / totalTarget * 100;
+
+    document.getElementById("target").textContent = rupiah(totalTarget);
+    document.getElementById("actual").textContent = rupiah(totalActual);
+    document.getElementById("achievement").textContent =
+      achievement.toFixed(1) + "%";
+    document.getElementById("gap").textContent =
+      (totalActual - totalTarget < 0 ? "-" : "") +
+      rupiah(Math.abs(totalActual - totalTarget));
+
+    document.getElementById("sales-table").innerHTML =
+      sales.map(x => {
+        const pct = x.actual / x.target * 100;
+        return `<tr>
+          <td>${x.area}</td>
+          <td>${rupiah(x.target)}</td>
+          <td>${rupiah(x.actual)}</td>
+          <td>
+            <b>${pct.toFixed(1)}%</b>
+            <div class="bar">
+              <span style="width:${Math.min(pct, 100)}%"></span>
+            </div>
+          </td>
+        </tr>`;
+      }).join("");
+
+    document.getElementById("chart").innerHTML =
+      sales.map(x => {
+        const pct = x.actual / x.target * 100;
+        return `<p><b>${x.area}</b> — ${pct.toFixed(1)}%</p>
+          <div class="bar">
+            <span style="width:${Math.min(pct, 100)}%"></span>
+          </div>`;
+      }).join("");
+  </script>
+</body>
+</html>
